@@ -1,0 +1,8 @@
+.DS_Store
+.Rbuildignore
+.vscode
+
+.pdf
+.RData
+.tar.gz
+

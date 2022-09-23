@@ -1,0 +1,23 @@
+bibentry(bibtype = "Article",
+  title        = "Tissue-specific identification of multi-omics features for pan-cancer drug response prediction",
+  author       = c(person(given = "Zhi",
+                          family = "Zhao",
+                          email = "zhi.zhao@medisin.uio.no"),
+                   person(given = "Shixiong",
+                          family = "Wang",
+                          email = "shixiong.wang@rr-research.no"),
+                   person(given = "Manuela",
+                          family = "Zucknick",
+                          email = "manuela.zucknick@medisin.uio.no"),
+                   person(given = "Tero",
+                          family = "Aittokallio",
+                          email = "t.a.aittokallio@medisin.uio.no")),
+  journal      = "iScience",
+  year         = "2022",
+  volume       = "25",
+  number       = "8",
+  pages        = "104767",
+  doi          = "10.1016/j.isci.2022.104767",
+  header       = "To cite EnrichIntersect in publications use:"
+)
+

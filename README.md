@@ -9,7 +9,7 @@ This is a flexible R package for enrichment analysis based on user-defined sets.
 > Zhi Zhao, Manuela Zucknick, Tero Aittokallio (2022).
 > EnrichIntersect: an R package for custom set enrichment analysis and
 > interactive visualization of intersecting sets. _Bioinformatics Advances_,
-> to appear.
+> vbac073. DOI: [10.1093/bioadv/vbac073](https://doi.org/10.1093/bioadv/vbac073).
 
 > Zhi Zhao, Shixiong Wang, Manuela Zucknick, Tero Aittokallio (2022).
 > Tissue-specific identification of multi-omics features for pan-cancer

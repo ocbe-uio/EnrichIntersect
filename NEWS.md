@@ -1,6 +1,10 @@
+# EnrichIntersect 0.5
+
+- Minor update
+
 # EnrichIntersect 0.4
 
-- For a intersecting Sankey diagram, removed intermediate variables without associations with any tasks or levels automatically
+- For a intersecting Sankey diagram, automatically removed intermediate variables without associations with any tasks or levels automatically
 
 # EnrichIntersect 0.3
 

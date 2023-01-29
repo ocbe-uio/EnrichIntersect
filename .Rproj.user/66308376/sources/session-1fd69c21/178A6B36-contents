@@ -1,0 +1,24 @@
+library(styler)
+style_pkg(pkg = "/Users/zhiz/zz/EnrichIntersect/R")
+library(lintr)
+lint_dir(path = "/Users/zhiz/zz/EnrichIntersect/R")
+
+rm(list = ls())
+remove.packages("EnrichIntersect")
+# Build the package
+#devtools::document("/Users/zhiz/zz/EnrichIntersect")
+#devtools::build("/Users/zhiz/zz/EnrichIntersect",vignettes=TRUE)
+#devtools::check("/Users/zhiz/zz/EnrichIntersect", cran=TRUE)
+
+#"Use terminal to build up package, otherwise problematic to show vignette"
+#zhiz$ R CMD build /Users/zhiz/zz/EnrichIntersect
+#zhiz$ R CMD INSTALL EnrichIntersect_0.5.tar.gz
+#zhiz$ R CMD check EnrichIntersect_0.5.tar.gz --as-cran --run-donttest
+
+## Install the package
+install.packages("/Users/zhiz/EnrichIntersect_0.5.tar.gz",repos = NULL,type = "source",build_vignettes = T)
+
+
+pdf("drug_gene.pdf",width = 4,height = 3.5)
+enrich <- enrichment(x, custom.set)
+dev.off()

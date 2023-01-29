@@ -19,24 +19,33 @@ enrichment(
 \arguments{
 \item{x}{a vector (matrix) of scores to be enriched}
 
-\item{custom.set}{a self-defined set that summarizes a few groups of the names (rownames) of \code{x}}
+\item{custom.set}{a self-defined set that summarizes a few groups of the 
+names (rownames) of \code{x}}
 
-\item{alpha}{exponent weight of the score of ordered features. Default is \code{0} for calculating enrichment score via classic Kolmogorov-Smirnov statistic}
+\item{alpha}{exponent weight of the score of ordered features. Default is 
+\code{0} for calculating enrichment score via classic Kolmogorov-Smirnov 
+statistic}
 
-\item{normalize}{logic value to determine if normalizing enrichment scores, accounting for custom set size. Default is \code{TRUE}}
+\item{normalize}{logic value to determine if normalizing enrichment scores, 
+accounting for custom set size. Default is \code{TRUE}}
 
-\item{permute.n}{number of custom-set permutations for significance testing. Default is 100}
+\item{permute.n}{number of custom-set permutations for significance 
+testing. Default is 100}
 
-\item{padj.method}{correction method, one of \code{"holm"}, \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, \code{"BY"}, \code{"fdr"}, \code{"none"}. Default is \code{"none"}}
+\item{padj.method}{correction method, one of \code{"holm"}, 
+\code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, 
+\code{"BY"}, \code{"fdr"}, \code{"none"}. Default is \code{"none"}}
 
-\item{pvalue.cutoff}{a cutoff for both unadjusted and adjusted p-value to mark significantly enriched classes. Default is 0.05}
+\item{pvalue.cutoff}{a cutoff for both unadjusted and adjusted p-value to 
+mark significantly enriched classes. Default is 0.05}
 
 \item{angle}{angle of rotating x-axis labels. Default is 45}
 
 \item{...}{other arguments}
 }
 \value{
-Return a list including a matrix of (normalized) enrichment score, a matrix of corresponding p-value and ggplot object:
+Return a list including a matrix of (normalized) enrichment score, 
+a matrix of corresponding p-value and ggplot object:
 \itemize{
 \item S - a matrix of calculated enrichment scores.
 \item pvalue - a matrix of p-values using permuation test for the calculated enrichment scores.
@@ -44,10 +53,12 @@ Return a list including a matrix of (normalized) enrichment score, a matrix of c
 }
 }
 \description{
-Plot enrichment map through a vector (matrix) of scores and a self-defined set that summarizes a few groups of the names (rownames) of the vector (matrix)
+Plot enrichment map through a vector (matrix) of scores and a self-defined 
+set that summarizes a few groups of the names (rownames) of the vector 
+(matrix)
 }
 \examples{
-# Data set 'cancers_drug_groups' is a list including a score dataframe with 147 drugs as rows 
+# Data set 'cancers_drug_groups' is a list including a score dataframe with 147 drugs as rows
 # and 19 cancer types as columns, and a dataframe with 9 self-defined drug groups (1st column)
 # of the 147 drugs (2nd column).
 data(cancers_drug_groups, package = "EnrichIntersect")
@@ -55,9 +66,11 @@ data(cancers_drug_groups, package = "EnrichIntersect")
 x <- cancers_drug_groups$score
 custom.set <- cancers_drug_groups$custom.set
 set.seed(123)
-enrich <- enrichment(x, custom.set, permute.n=5)
+enrich <- enrichment(x, custom.set, permute.n = 5)
 
 }
 \references{
-Reimand J, Isserlin R, Voisin V, et al (2019). \emph{Pathway enrichment analysis and visualization of omics data using g:profiler, gsea, cytoscape and enrichmentmap}. Nature protocols, 14:482–517.
+Reimand J, Isserlin R, Voisin V, et al (2019). \emph{Pathway 
+enrichment analysis and visualization of omics data using g:profiler, gsea, 
+cytoscape and enrichmentmap}. Nature protocols, 14:482–517.
 }

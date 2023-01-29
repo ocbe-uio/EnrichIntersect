@@ -16,29 +16,36 @@ intersectSankey(
 \arguments{
 \item{x}{an array for constructing intersecting set}
 
-\item{out.fig}{print the figure into \code{"html"}, \code{"pdf"} or \code{"png"} file. Default is \code{NULL} with R graphics device}
+\item{out.fig}{print the figure into \code{"html"}, \code{"pdf"} or 
+\code{"png"} file. Default is \code{NULL} with R graphics device}
 
 \item{color}{a vector of colors corresponding to individual tasks}
 
-\item{step.names}{names of the three dimensions of the array \code{x}, i.e. names of multiple levels, intermediate variables and tasks.
-Default is \code{c("Levels","Variables","Tasks")}. If \code{step.names=NULL}, it will not show the names}
+\item{step.names}{names of the three dimensions of the array \code{x}, i.e. 
+names of multiple levels, intermediate variables and tasks. Default is 
+\code{c("Levels","Variables","Tasks")}. If \code{step.names=NULL}, it will 
+not show the names}
 
-\item{fontSize}{a value or vector of three values. If it is one value, it is the font size for all labels. 
-But a vector of three values specifies the font size of the labels in the left, middle and right, respectively.  Default is \code{c(20,10,20)}}
+\item{fontSize}{a value or vector of three values. If it is one value, it 
+is the font size for all labels. But a vector of three values specifies the 
+font size of the labels in the left, middle and right, respectively. Default 
+is \code{c(20,10,20)}}
 
-\item{...}{graphics parameters to be passed to \code{sankeyNetwork()} from R package \code{networkD3}}
+\item{...}{graphics parameters to be passed to \code{sankeyNetwork()} 
+from R package \code{networkD3}}
 }
 \value{
-An object of a D3 JavaScript intersecting Sankey diagram for visualising associations based on the input array.
+An object of a D3 JavaScript intersecting Sankey diagram for 
+visualising associations based on the input array.
 }
 \description{
 Plot Sankey diagram for intersecting set through an array
 }
 \examples{
-# Data set 'cancers_genes_drugs' is an array with association scores between 56 genes (1st 
+# Data set 'cancers_genes_drugs' is an array with association scores between 56 genes (1st
 # dimension), three cancer types (2nd dimension) and two drugs (3rd dimension)
 data(cancers_genes_drugs, package = "EnrichIntersect")
 
-intersectSankey(cancers_genes_drugs, step.names=c("Cancers","Genes","Drugs"))
+intersectSankey(cancers_genes_drugs, step.names = c("Cancers", "Genes", "Drugs"))
 
 }

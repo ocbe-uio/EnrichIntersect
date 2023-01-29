@@ -2,6 +2,7 @@
 .Rbuildignore
 .vscode
 
+test.R
 .pdf
 .RData
 .tar.gz

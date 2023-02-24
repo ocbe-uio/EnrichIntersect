@@ -11,8 +11,14 @@ License: MIT + file LICENSE
 Depends: R (>= 4.0)
 Encoding: UTF-8
 RoxygenNote: 7.2.3
-Imports: ggplot2, dplyr, networkD3, jsonlite, htmlwidgets, webshot2, stats, methods, grDevices
+Imports: ggplot2, dplyr, networkD3, jsonlite, htmlwidgets, webshot2,
+        stats, methods, grDevices
 Suggests: knitr
 LazyData: true
 VignetteBuilder: knitr
 NeedsCompilation: no
+Packaged: 2023-02-24 22:30:53 UTC; zhiz
+Author: Zhi Zhao [aut, cre],
+  Manuela Zucknick [aut],
+  Tero Aittokallio [ctb]
+Maintainer: Zhi Zhao <zhi.zhao@medisin.uio.no>

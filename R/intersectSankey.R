@@ -22,8 +22,12 @@
 #' not show the names
 #' @param fontSize a value or vector of three values. If it is one value, it 
 #' is the font size for all labels. But a vector of three values specifies the 
-#' font size of the labels in the left, middle and right, respectively. Default 
+#' font size of the labels in the left, middle and right, respectively. Default
 #' is \code{c(20,10,20)}
+#' @param nodePadding numeric essentially influences the width height
+#' @param nodeWidth numeric width of each node
+#' @param margin an integer or a named list/vector of integers for the plot 
+#' margins
 #' @param ... graphics parameters to be passed to \code{sankeyNetwork()} 
 #' from R package \code{networkD3}
 #'

@@ -40,10 +40,18 @@
 #' @export
 intersectSankey <- function(x, out.fig = NULL, color = NULL, 
                             step.names = c("Levels", "Variables", "Tasks"), 
-                            fontSize = c(20, 13, 20), ...) {
+                            fontSize = c(20, 13, 20), nodePadding = 11,
+                            nodeWidth = 5, margin = list(right = 180), ...) {
   # remove intermediate variables without associations with any tasks or levels
   x <- x[apply(x != 0, 1, sum) != 0, , ]
+  # remove levels without associations with any intermediate variables or tasks
+  x <- x[, apply(x != 0, 2, sum) != 0, ]
+  # remove tasks without associations with any intermediate variables or levels
+  x <- x[, , apply(x != 0, 3, sum) != 0]
 
+  if(is.null(dimnames(x)[[1]]) | is.null(dimnames(x)[[1]]) | is.null(dimnames(x)[[1]])) {
+    stop("Please provide all dimnames of x!")
+  }
   # intermediate variables
   inter_var <- dimnames(x)[[1]]
   # multiple sample groups
@@ -70,7 +78,7 @@ intersectSankey <- function(x, out.fig = NULL, color = NULL,
 
   # construct edge colors
   links$group <- c(rep("white", nrow(links)))
-  for (i in seq_along(length(multitask))) {
+  for (i in seq_along(multitask)) {
     links$group[links$target == multitask[i]] <- multitask[i]
   }
   
@@ -81,7 +89,7 @@ intersectSankey <- function(x, out.fig = NULL, color = NULL,
       multitask[xx == 1]
     })))
   }
-  links$group[seq_along(length(group_tmp))] <- group_tmp
+  links$group[seq_along(group_tmp)] <- group_tmp
   links$group <- as.factor(links$group)
 
   nodes <- data.frame(name = c(as.character(links$source), 
@@ -103,6 +111,7 @@ intersectSankey <- function(x, out.fig = NULL, color = NULL,
     if (length(color) != dim(x)[3]) {
       stop("Please specify the argument 'colors' correctly!")
     }
+    mycolor <- c(color, "white")
   }
   color_scale <- data.frame(
     range = mycolor,
@@ -116,10 +125,10 @@ intersectSankey <- function(x, out.fig = NULL, color = NULL,
     fontSize <- rep(fontSize, 3)
   }
 
-  # check and set some default arguments passing to sankeyNetwork()
-  if (!hasArg(nodePadding)) nodePadding <- 11
-  if (!hasArg(nodeWidth)) nodeWidth <- 5
-  if (!hasArg(margin)) margin <- list(right = 180)
+  # # check and set some default arguments passing to sankeyNetwork()
+  # if (!hasArg(nodePadding)) nodePadding <- 11
+  # if (!hasArg(nodeWidth)) nodeWidth <- 5
+  # if (!hasArg(margin)) margin <- list(right = 180)
 
   # plot a Sankey diagram
   g <- sankeyNetwork(

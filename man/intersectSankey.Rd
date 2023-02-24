@@ -10,6 +10,9 @@ intersectSankey(
   color = NULL,
   step.names = c("Levels", "Variables", "Tasks"),
   fontSize = c(20, 13, 20),
+  nodePadding = 11,
+  nodeWidth = 5,
+  margin = list(right = 180),
   ...
 )
 }

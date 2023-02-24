@@ -1,3 +1,8 @@
+# EnrichIntersect 0.6
+
+- Automatically filter out non-edge data from the input object of `intersectSankey()`
+- Fixed bugs introduced in v0.5
+
 # EnrichIntersect 0.5
 
 - Updated reference and cleaned R code

@@ -3,7 +3,10 @@
 .vscode
 
 test.R
-.pdf
 .RData
 .tar.gz
 
+/.Rproj.user/
+*.Rproj
+*.html
+*.pdf

@@ -3,10 +3,10 @@
 .vscode
 
 test.R
+sankey.html
 .RData
 .tar.gz
 
 /.Rproj.user/
 *.Rproj
-*.html
 *.pdf

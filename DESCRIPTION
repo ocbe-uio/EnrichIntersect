@@ -17,7 +17,7 @@ Suggests: knitr
 LazyData: true
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-03-14 15:18:31 UTC; zhiz
+Packaged: 2024-03-14 15:42:21 UTC; zhiz
 Author: Zhi Zhao [aut, cre],
   Manuela Zucknick [aut],
   Tero Aittokallio [ctb]

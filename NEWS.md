@@ -1,3 +1,8 @@
+# EnrichIntersect 0.7
+
+- Fixed issue with the legend of p<0.05
+- Added REAMD.md
+
 # EnrichIntersect 0.6
 
 - Automatically filter out non-edge data from the input object of `intersectSankey()`

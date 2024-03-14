@@ -227,15 +227,18 @@ enrichment <- function(x, custom.set, alpha = 0, normalize = TRUE,
       guides(colour = guide_legend(override.aes = list(size = 5))) +
       scale_size(name = ES.name, range = c(1, 5), breaks = c(0, 1, 2, 3), 
                  guide = guide_legend(keyheight = .8)) +
-      theme(axis.text.x = element_text(size = 8, angle = angle, 
-                                       vjust = 1, hjust = 1)) +
+      theme(axis.text.x = 
+              element_text(size = 8, angle = angle, vjust = 1, hjust = 1), 
+            legend.margin = margin(-0.1,0,0,0, unit="cm")) +
       xlab("") + ylab("")
 
     if (pvalue.cutoff == 0.05) {
-      g <- g + scale_color_manual(name = NULL, values = c("p<0.05" = "red"))
+      g <- g + scale_color_manual(name = NULL, 
+                                  values = c(`red` = "red"), labels = "p<0.05")
     } else {
       if (pvalue.cutoff == 0.1) {
-        g <- g + scale_color_manual(name = NULL, values = c("p<0.1" = "red"))
+        g <- g + scale_color_manual(name = NULL, 
+                                    values = c(`red` = "red"), labels = "p<0.1")
       } else {
         g <- g + scale_color_manual(name = NULL, values = c("gray", "red"), 
                                     labels = paste0("p", c(">=", "<"), 

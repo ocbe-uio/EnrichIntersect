@@ -28,7 +28,7 @@ library("EnrichIntersect")
 
 An example input data object `cancers_drug_groups` is an R `list` provided in our package, which includes a `data.frame` object with 147 cancer drugs as rows and nine cancer types as columns, and another `data.frame` that groups the 147 drugs (second column) into nine user-defined drug classes (first column). The default setup of `enrichment()` uses the classic K-S test statistic to calculate the normalized enrichment score that quantifies the degree to which the features in a feature set are over-represented at the top or bottom of the entire ranked list of features (e.g. a list of drugs), using as default 100 permutations for the empirical null test statistic. In the visualization, the statistically significantly enriched feature sets are marked with red coloured circles given a pre-specified significance level. The pre-specified significance level will be adjusted automatically if argument `padj.method` is one of `c("holm","hochberg","hommel","bonferroni","BH","BY","fdr","none")`. Users can specify the argument `alpha` for calculating a weighted enrichment score, argument `normalize=FALSE` for using the standard enrichment score rather than the normalized score, argument `permute.n` for the number of permutations of the ranked feature list used for estimating the empirical null test statistic, and the argument `pvalue.cutoff` for marking enriched categories at a specific significance level. See the following code for an example.
 
-```{r enrichment_map, results="hide", fig.width=7, fig.height=5}
+```{r enrichment_map, results="hide", fig.width=7.2, fig.height=5}
 x <- cancers_drug_groups$score
 custom.set <- cancers_drug_groups$custom.set
 set.seed(123)

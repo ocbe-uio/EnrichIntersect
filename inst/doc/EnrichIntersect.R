@@ -1,10 +1,10 @@
 ## ----setup, include=FALSE-----------------------------------------------------
 knitr::opts_chunk$set(echo = TRUE)
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 library("EnrichIntersect")
 
-## ----enrichment_map, results="hide", fig.width=7, fig.height=5----------------
+## ----enrichment_map, results="hide", fig.width=7.2, fig.height=5--------------
 x <- cancers_drug_groups$score
 custom.set <- cancers_drug_groups$custom.set
 set.seed(123)

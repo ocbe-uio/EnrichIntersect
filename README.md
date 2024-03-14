@@ -16,8 +16,8 @@ library("EnrichIntersect")
 Install the latest development version from GitHub
 
 ```r
-library("devtools")
-devtools::install_github("ocbe-uio/EnrichIntersect")
+#install.packages("remotes")
+remotes::install_github("ocbe-uio/EnrichIntersect")
 library("EnrichIntersect")
 ```
 

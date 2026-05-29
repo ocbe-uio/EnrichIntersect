@@ -1,6 +1,6 @@
 
 [![CRAN](http://www.r-pkg.org/badges/version/EnrichIntersect)](https://cran.r-project.org/package=EnrichIntersect)
-\[![r-universe](https://ocbe-uio.r-universe.dev/badges/Enrichio.r-universe.dev/EnrichIntersect)
+[![r-universe](https://ocbe-uio.r-universe.dev/badges/EnrichIntersect)](https://zhizuio.r-universe.dev/EnrichIntersect)
 [![R-CMD-check](https://github.com/ocbe-uio/EnrichIntersect/workflows/R-CMD-check/badge.svg)](https://github.com/ocbe-uio/EnrichIntersect/actions)
 [![License:
 MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)

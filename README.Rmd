@@ -1,0 +1,66 @@
+[![CRAN](http://www.r-pkg.org/badges/version/EnrichIntersect)](https://cran.r-project.org/package=EnrichIntersect)
+[![r-universe](https://ocbe-uio.r-universe.dev/badges/Enrichio.r-universe.dev/EnrichIntersect)
+[![R-CMD-check](https://github.com/ocbe-uio/EnrichIntersect/workflows/R-CMD-check/badge.svg)](https://github.com/ocbe-uio/EnrichIntersect/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://img.shields.io/badge/doi-10.1093%2Fbioadv%2Fvbac073-brightgreen)](https://doi.org/10.1093/bioadv/vbac073)
+
+# EnrichIntersect
+
+`EnrichIntersect` is a flexible tool for enrichment analysis based on user-defined sets. It allows users to perform over-representation analysis of custom sets among any specified ranked feature list, making enrichment analysis applicable to various types of data from different scientific fields. `EnrichIntersect` also provides interactive visualization of intersecting sets, for example based on the mix-lasso model ([Zhao et al., 2022](https://doi.org/10.1016/j.isci.2022.104767)) or similar methods.
+
+To get started, load the package with:
+
+```{r}
+library("EnrichIntersect")
+```
+
+## Examples
+
+### Plot enrichment map
+
+The example data object `cancers_drug_groups` is an R `list` provided in the package. It includes a `data.frame` with 147 cancer drugs as rows and nine cancer types as columns, and another `data.frame` that assigns the 147 drugs, listed in the first column, to nine user-defined drug classes, listed in the second column.
+
+The default setup of `enrichment()` uses a classic Kolmogorov-Smirnov-like test statistic to calculate the normalized enrichment score. This score quantifies the degree to which features in a user-defined set are over-represented at the top of a ranked feature list. By default, `enrichment()` uses 100 permutations for the empirical null test statistic.
+
+In the visualization, statistically significantly enriched feature sets are marked with red circles at a pre-specified significance level. The p-values can be adjusted by specifying `padj.method`, using one of `c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")`. Users can specify `alpha` for calculating a weighted enrichment score, `normalize = FALSE` for using the standard enrichment score rather than the normalized score, `permute.n` for the number of permutations, and `pvalue.cutoff` for marking enriched categories at a specific significance level.
+
+```{r enrichment-map, eval=TRUE, results="hide", fig.width=7.2, fig.height=5}
+data(cancers_drug_groups, package = "EnrichIntersect")
+
+x <- cancers_drug_groups$score
+custom.set <- cancers_drug_groups$custom.set
+
+set.seed(123)
+enrich <- enrichment(x, custom.set, permute.n = 1000)
+```
+
+
+### Plot Sankey diagram for intersecting sets through an array
+
+The `EnrichIntersect` function `intersectSankey()` creates a Sankey diagram to visualize intersecting sets from an `array` object. The first dimension represents intermediate variables, while the second and third dimensions represent multiple levels and multiple tasks, respectively.
+
+One intersecting set is a list of intermediate variables associated with a combination of a subset of levels and a subset of tasks. Such relationships can be difficult to visualize when there are many possible combinations. The function `intersectSankey()` adapts `sankeyNetwork()` from the R package `networkD3` to create a D3 JavaScript interactive Sankey diagram suitable for multiple levels, multiple tasks, and many intermediate variables.
+
+Besides displaying the Sankey diagram in the R graphics device, users can save it as an interactive HTML file, or as a PDF or PNG file via the R package `webshot2`. The argument `out.fig = c(NA, "html", "pdf", "png")` controls whether the figure is displayed or saved as an HTML, PDF, or PNG file.
+
+The example data object `cancers_genes_drugs` is an `array` with associations between 56 genes, two cancer types, and two drugs. Users can adjust `out.fig` for different output formats and use `step.names` to label the three dimensions in the Sankey diagram.
+
+```{r sankey-diagram, eval=TRUE, fig.width=9, fig.height=7}
+data(cancers_genes_drugs, package = "EnrichIntersect")
+
+intersectSankey(
+  cancers_genes_drugs,
+  step.names = c("Cancers", "Genes", "Drugs")
+)
+```
+
+
+## Citation
+
+Zhi Zhao, Manuela Zucknick, Tero Aittokallio (2022).  
+EnrichIntersect: an R package for custom set enrichment analysis and interactive visualization of intersecting sets.  
+*Bioinformatics Advances*, 2(1), vbac073. DOI: [10.1093/bioadv/vbac073](https://doi.org/10.1093/bioadv/vbac073).
+
+Zhi Zhao, Shixiong Wang, Manuela Zucknick, Tero Aittokallio (2022).  
+Tissue-specific identification of multi-omics features for pan-cancer drug response prediction.  
+*iScience*, 25(8), 104767. DOI: [10.1016/j.isci.2022.104767](https://doi.org/10.1016/j.isci.2022.104767).

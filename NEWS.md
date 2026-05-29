@@ -1,3 +1,7 @@
+# EnrichIntersect 1.0
+
+- Added Rcpp code to speedup function `enrichment()`
+
 # EnrichIntersect 0.7
 
 - Fixed issue with the legend of p<0.05

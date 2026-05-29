@@ -13,64 +13,37 @@ enrichment(
   padj.method = "none",
   pvalue.cutoff = 0.05,
   angle = 45,
+  match.feature = c("rownames", "colnames"),
   ...
 )
 }
 \arguments{
-\item{x}{a vector (matrix) of scores to be enriched}
+\item{x}{a vector or matrix of scores to be enriched}
 
-\item{custom.set}{a self-defined set that summarizes a few groups of the 
-names (rownames) of \code{x}}
+\item{custom.set}{a self-defined set. The first column contains feature names,
+and the second column, preferably named "group", contains group names.}
 
-\item{alpha}{exponent weight of the score of ordered features. Default is 
-\code{0} for calculating enrichment score via classic Kolmogorov-Smirnov 
-statistic}
+\item{alpha}{exponent weight of the score of ordered features.}
 
-\item{normalize}{logic value to determine if normalizing enrichment scores, 
-accounting for custom set size. Default is \code{TRUE}}
+\item{normalize}{logical value to determine if normalizing enrichment scores.}
 
-\item{permute.n}{number of custom-set permutations for significance 
-testing. Default is 100}
+\item{permute.n}{number of custom-set permutations for significance testing.}
 
-\item{padj.method}{correction method, one of \code{"holm"}, 
-\code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, 
-\code{"BY"}, \code{"fdr"}, \code{"none"}. Default is \code{"none"}}
+\item{padj.method}{correction method passed to stats::p.adjust.}
 
-\item{pvalue.cutoff}{a cutoff for both unadjusted and adjusted p-value to 
-mark significantly enriched classes. Default is 0.05}
+\item{pvalue.cutoff}{cutoff for both unadjusted and adjusted p-value.}
 
-\item{angle}{angle of rotating x-axis labels. Default is 45}
+\item{angle}{angle of rotating x-axis labels.}
+
+\item{match.feature}{one of "rownames" or "colnames". Default is "rownames",
+which keeps the original EnrichIntersect behavior.}
 
 \item{...}{other arguments}
 }
 \value{
-Return a list including a matrix of (normalized) enrichment score, 
-a matrix of corresponding p-value and ggplot object:
-\itemize{
-\item S - a matrix of calculated enrichment scores.
-\item pvalue - a matrix of p-values using permuation test for the calculated enrichment scores.
-\item g - a ggplot object for visualising the results of an enrichment analysis.
-}
+A list including S, pvalue, and g.
 }
 \description{
-Plot enrichment map through a vector (matrix) of scores and a self-defined 
-set that summarizes a few groups of the names (rownames) of the vector 
-(matrix)
-}
-\examples{
-# Data set 'cancers_drug_groups' is a list including a score dataframe with 147 drugs as rows
-# and 19 cancer types as columns, and a dataframe with 9 self-defined drug groups (1st column)
-# of the 147 drugs (2nd column).
-data(cancers_drug_groups, package = "EnrichIntersect")
-
-x <- cancers_drug_groups$score
-custom.set <- cancers_drug_groups$custom.set
-set.seed(123)
-enrich <- enrichment(x, custom.set, permute.n = 5)
-
-}
-\references{
-Reimand J, Isserlin R, Voisin V, et al (2019). \emph{Pathway 
-enrichment analysis and visualization of omics data using g:profiler, gsea, 
-cytoscape and enrichmentmap}. Nature protocols, 14:482–517.
+Plot enrichment map through a vector or matrix of scores and a self-defined
+set that summarizes a few groups of the names of the vector or matrix.
 }

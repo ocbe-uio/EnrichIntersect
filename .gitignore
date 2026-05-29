@@ -2,7 +2,10 @@
 .Rbuildignore
 .vscode
 
+README.html
+cleanup
 test.R
+test_build*.R
 sankey.html
 .RData
 .tar.gz

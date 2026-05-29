@@ -33,7 +33,7 @@ data(cancers_drug_groups, package = "EnrichIntersect")
 x <- cancers_drug_groups$score
 custom.set <- cancers_drug_groups$custom.set
 set.seed(123)
-enrich <- enrichment(x, custom.set, permute.n = 100)
+enrich <- enrichment(x, custom.set, permute.n = 1000)
 ```
 
 
@@ -52,12 +52,12 @@ intersectSankey(cancers_genes_drugs, step.names = c("Cancers", "Genes", "Drugs")
 
 ## Citation
 
-> Zhi Zhao, Manuela Zucknick, Tero Aittokallio (2022).
-> EnrichIntersect: an R package for custom set enrichment analysis and interactive visualization of intersecting sets. 
-> _Bioinformatics Advances_, 2(1), vbac073. DOI: [10.1093/bioadv/vbac073](https://doi.org/10.1093/bioadv/vbac073).
+Zhi Zhao, Manuela Zucknick, Tero Aittokallio (2022).
+EnrichIntersect: an R package for custom set enrichment analysis and interactive visualization of intersecting sets. 
+_Bioinformatics Advances_, 2(1), vbac073. DOI: [10.1093/bioadv/vbac073](https://doi.org/10.1093/bioadv/vbac073).
 
-> Zhi Zhao, Shixiong Wang, Manuela Zucknick, Tero Aittokallio (2022).
-> Tissue-specific identification of multi-omics features for pan-cancer drug response prediction.
-> _iScience_, 25(8): 104767. DOI: [10.1016/j.isci.2022.104767](https://doi.org/10.1016/j.isci.2022.104767).
+Zhi Zhao, Shixiong Wang, Manuela Zucknick, Tero Aittokallio (2022).
+Tissue-specific identification of multi-omics features for pan-cancer drug response prediction.
+_iScience_, 25(8): 104767. DOI: [10.1016/j.isci.2022.104767](https://doi.org/10.1016/j.isci.2022.104767).
 
 

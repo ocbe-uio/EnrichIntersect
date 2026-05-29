@@ -1,71 +1,66 @@
 #' @title Plot enrichment map
 #' @description
-#' Plot enrichment map through a vector (matrix) of scores and a self-defined 
-#' set that summarizes a few groups of the names (rownames) of the vector 
-#' (matrix)
+#' Plot enrichment map through a vector or matrix of scores and a self-defined
+#' set that summarizes a few groups of the names of the vector or matrix.
 #'
 #' @name enrichment
 #'
 #' @import ggplot2
-#' @importFrom utils txtProgressBar setTxtProgressBar
 #' @importFrom stats p.adjust
 #'
-#' @param x a vector (matrix) of scores to be enriched
-#' @param custom.set a self-defined set that summarizes a few groups of the 
-#' names (rownames) of \code{x}
-#' @param alpha exponent weight of the score of ordered features. Default is 
-#' \code{0} for calculating enrichment score via classic Kolmogorov-Smirnov 
-#' statistic
-#' @param normalize logic value to determine if normalizing enrichment scores, 
-#' accounting for custom set size. Default is \code{TRUE}
-#' @param permute.n number of custom-set permutations for significance 
-#' testing. Default is 100
-#' @param padj.method correction method, one of \code{"holm"}, 
-#' \code{"hochberg"}, \code{"hommel"}, \code{"bonferroni"}, \code{"BH"}, 
-#' \code{"BY"}, \code{"fdr"}, \code{"none"}. Default is \code{"none"}
-#' @param pvalue.cutoff a cutoff for both unadjusted and adjusted p-value to 
-#' mark significantly enriched classes. Default is 0.05
-#' @param angle angle of rotating x-axis labels. Default is 45
+#' @param x a vector or matrix of scores to be enriched
+#' @param custom.set a self-defined set. The first column contains feature names,
+#'   and the second column, preferably named "group", contains group names.
+#' @param alpha exponent weight of the score of ordered features.
+#' @param normalize logical value to determine if normalizing enrichment scores.
+#' @param permute.n number of custom-set permutations for significance testing.
+#' @param padj.method correction method passed to stats::p.adjust.
+#' @param pvalue.cutoff cutoff for both unadjusted and adjusted p-value.
+#' @param angle angle of rotating x-axis labels.
+#' @param match.feature one of "rownames" or "colnames". Default is "rownames",
+#'   which keeps the original EnrichIntersect behavior.
 #' @param ... other arguments
 #'
-#' @return Return a list including a matrix of (normalized) enrichment score, 
-#' a matrix of corresponding p-value and ggplot object:
-#' \itemize{
-#' \item S - a matrix of calculated enrichment scores.
-#' \item pvalue - a matrix of p-values using permuation test for the calculated enrichment scores.
-#' \item g - a ggplot object for visualising the results of an enrichment analysis.
-#' }
-#'
-#' @references Reimand J, Isserlin R, Voisin V, et al (2019). \emph{Pathway 
-#' enrichment analysis and visualization of omics data using g:profiler, gsea, 
-#' cytoscape and enrichmentmap}. Nature protocols, 14:482–517.
-#'
-#' @examples
-#' # Data set 'cancers_drug_groups' is a list including a score dataframe with 147 drugs as rows
-#' # and 19 cancer types as columns, and a dataframe with 9 self-defined drug groups (1st column)
-#' # of the 147 drugs (2nd column).
-#' data(cancers_drug_groups, package = "EnrichIntersect")
-#'
-#' x <- cancers_drug_groups$score
-#' custom.set <- cancers_drug_groups$custom.set
-#' set.seed(123)
-#' enrich <- enrichment(x, custom.set, permute.n = 5)
+#' @return A list including S, pvalue, and g.
 #'
 #' @export
-enrichment <- function(x, custom.set, alpha = 0, normalize = TRUE, 
-                       permute.n = 100, padj.method = "none", 
-                       pvalue.cutoff = 0.05, angle = 45, ...) {
+enrichment <- function(
+    x,
+    custom.set,
+    alpha = 0,
+    normalize = TRUE,
+    permute.n = 100,
+    padj.method = "none",
+    pvalue.cutoff = 0.05,
+    angle = 45,
+    match.feature = c("rownames", "colnames"),
+    ...
+) {
+  match.feature <- match.arg(match.feature)
+  
+  ## --------------------------------------------------------------------------
+  ## Original-style input handling
+  ## --------------------------------------------------------------------------
+  
   if (is.matrix(x) || is.data.frame(x)) {
-    if (any(colSums(is.na(x)) == ncol(x)) && ncol(x) > 1) {
+    if (any(colSums(is.na(x)) == nrow(x)) && ncol(x) > 1) {
       stop("The argument 'x' matrix has some columns with all missing values!")
     }
   } else {
     x <- as.matrix(x)
   }
+  
+  x <- as.matrix(x)
+  storage.mode(x) <- "double"
+  
   if (is.null(colnames(x))) {
     colnames(x) <- "X"
   }
-
+  
+  if (is.null(rownames(x))) {
+    stop("The argument 'x' must have rownames matching the feature names in 'custom.set'!")
+  }
+  
   if (is.matrix(custom.set) || is.data.frame(custom.set)) {
     if (dim(custom.set)[2] != 2) {
       stop("The argument 'custom.set' has to have two columns!")
@@ -73,192 +68,255 @@ enrichment <- function(x, custom.set, alpha = 0, normalize = TRUE,
   } else {
     stop("The argument 'custom.set' has to be a matrix or dataframe!")
   }
-
-  if (length(unique(custom.set[[1]])) < length(unique(custom.set[[1]]))) {
-    stop("The argument 'custom.set' should have more sets/groups (2nd component 
-         of 'custom.set') than unique symbols (1st component of 'custom.set')!")
+  
+  custom.set <- as.data.frame(custom.set, stringsAsFactors = FALSE)
+  
+  ## Original code uses custom.set$group.
+  ## If the second column is not named "group", name it "group" for compatibility.
+  if (!"group" %in% colnames(custom.set)) {
+    colnames(custom.set)[2] <- "group"
   }
-
-  features <- intersect(rownames(x), custom.set[[1]])
+  
+  custom.set[[1]] <- trimws(as.character(custom.set[[1]]))
+  custom.set$group <- trimws(as.character(custom.set$group))
+  
+  ## --------------------------------------------------------------------------
+  ## Support original orientation and optional transposed orientation
+  ##
+  ## Original behavior:
+  ##   features are rownames(x)
+  ##
+  ## Optional:
+  ##   features are colnames(x), so use t(x) internally
+  ## --------------------------------------------------------------------------
+  
+  if (match.feature == "colnames") {
+    if (is.null(colnames(x))) {
+      stop("When match.feature = 'colnames', x must have colnames.")
+    }
+    
+    x_work <- t(x)
+  } else {
+    x_work <- x
+  }
+  
+  if (anyDuplicated(rownames(x_work))) {
+    stop("Feature names must be unique.")
+  }
+  
+  ## This follows the original source:
+  ## features <- intersect(rownames(x), custom.set[[1]])
+  features <- intersect(rownames(x_work), custom.set[[1]])
+  
+  if (length(features) == 0L) {
+    stop("None of the features in 'custom.set' matched the feature names of 'x'.")
+  }
+  
   groups <- unique(custom.set$group[custom.set[[1]] %in% features])
   n_groups <- length(groups)
-
-  # initialize some enrichment scores and pvalues
-  S <- matrix(nrow = ncol(x), ncol = n_groups)
-  rownames(S) <- colnames(x)
+  
+  if (n_groups == 0L) {
+    stop("No valid groups were found in 'custom.set'.")
+  }
+  
+  ## Restrict x to matched features, preserving the original intersect() order.
+  x_work <- x_work[features, , drop = FALSE]
+  
+  ## Build group-wise feature index list for the C++ core.
+  set_indices <- lapply(groups, function(g) {
+    idx <- match(
+      custom.set[[1]][custom.set$group == g],
+      features,
+      nomatch = 0L
+    )
+    
+    as.integer(unique(idx[idx > 0L]))
+  })
+  
+  names(set_indices) <- groups
+  
+  ## --------------------------------------------------------------------------
+  ## RcppArmadillo replacement for the original heavy for-loop
+  ##
+  ## This replaces the original:
+  ##
+  ##   for (i in seq_len(ncol(x))) {
+  ##       ...
+  ##   }
+  ##
+  ## The C++ function returns matrices with:
+  ##   rows    = columns/profiles of x_work
+  ##   columns = custom-set groups
+  ##
+  ## This is the same orientation as the original S and pvalue before t().
+  ## --------------------------------------------------------------------------
+  
+  core <- enrichment_core_original(
+    x = x_work,
+    set_indices = set_indices,
+    alpha = alpha,
+    normalize = normalize,
+    permute_n = as.integer(permute.n)
+  )
+  
+  S <- core$S
+  pvalue <- core$pvalue
+  
+  rownames(S) <- colnames(x_work)
   colnames(S) <- groups
-  pvalue <- S_norm <- S
-
-  # Initializes the progress bar
-  if (ncol(x) > 1) {
-    pb <- 
-      txtProgressBar(min = 0, max = ncol(x), style = 3, width = 50, char = "=")
-  } else {    
-    pb <- 
-      txtProgressBar(min = 0, max = n_groups, style = 3, width = 50, char = "=")
-  }
-
-  for (i in seq_len(ncol(x))) {
-    ## define costom sets 'myList'
-    cutOff <- -Inf # this parameter remains for unordered features for the future
-    myList <- x[, i]
-    names(myList) <- features
-    myList <- sort(myList, decreasing = TRUE)
-    myList <- myList[myList > cutOff]
-    n <- length(myList)
-
-    for (k in 1:n_groups) { # group index
-
-      idx <- rep(NA, n)
-      for (j in 1:n) {
-        idx[j] <- names(myList[j]) %in% 
-          custom.set[custom.set$group == groups[k], 1]
-      }
-      if (sum(idx)) {
-        F1 <- cumsum(abs(myList)^alpha * as.numeric(idx)) / 
-          sum(abs(myList)^alpha * as.numeric(idx))
-        F2 <- cumsum(as.numeric(!idx)) / 
-          (n - sum(custom.set$group == groups[k] & 
-                     features %in% names(myList)))
-
-        S[i, k] <- max(F1 - F2, na.rm = TRUE) 
-      } else {
-        S[i, k] <- NA
-      }
-
-      # permutation test
-      permute_S <- rep(NA, permute.n)
-      for (permute_i in 1:permute.n) {
-        permutationIdx <- sample(1:n, n) # n removes missing spearman's x
-        myList_permute <- myList
-        names(myList_permute) <- names(myList)[permutationIdx]
-        for (j in 1:n) {
-          idx[j] <- names(myList_permute[j]) %in% 
-            custom.set[custom.set$group == groups[k], 1]
-        }
-        if (sum(idx)) {
-          F1 <- cumsum(abs(myList_permute)^alpha * as.numeric(idx)) / 
-            sum(abs(myList_permute)^alpha * as.numeric(idx))
-          F2 <- cumsum(as.numeric(!idx)) / 
-            (n - sum(custom.set$group == groups[k] & 
-                       features %in% names(myList)))
-
-          permute_S[permute_i] <- max(F1 - F2, na.rm = TRUE)
-        }
-      }
-      ## i) p-value for enrichment score
-      pvalue[i, k] <- sum(permute_S >= S[i, k], na.rm = TRUE) / 
-        (permute.n - sum(is.na(permute_S)))
-
-
-      ## ii) normalized enrichment score
-      if (normalize) {
-        S_norm <- S
-        if (!is.na(S[i, k])) {
-          if (S[i, k] >= 0) {
-            S_norm[i, k] <- 
-              S[i, k] / mean(permute_S[permute_S >= 0], na.rm = TRUE)
-          } else {
-            S_norm[i, k] <- 
-              S[i, k] / mean(permute_S[permute_S < 0], na.rm = TRUE)
-          }
-        }
-        S <- S_norm
-        permute_S_norm <- rep(NA, permute.n)
-        for (permute_i in 1:permute.n) {
-          if (!is.na(permute_S[permute_i])) {
-            if (permute_S[permute_i] >= 0) {
-              permute_S_norm[permute_i] <- permute_S[permute_i] / 
-                mean(permute_S[permute_S >= 0], na.rm = TRUE)
-            } else {
-              permute_S_norm[permute_i] <- permute_S[permute_i] / 
-                mean(permute_S[permute_S < 0], na.rm = TRUE)
-            }
-          }
-        }
-        pvalue[i, k] <- sum(permute_S_norm >= S_norm[i, k], na.rm = TRUE) / 
-          (permute.n - sum(is.na(permute_S_norm)))
-      }
-    }
-    # Sets the progress bar to the current state
-    setTxtProgressBar(pb, i)
-  }
-  close(pb) # Close the connection
-
+  
+  rownames(pvalue) <- colnames(x_work)
+  colnames(pvalue) <- groups
+  
+  ## --------------------------------------------------------------------------
+  ## Original post-processing and original plot format
+  ## --------------------------------------------------------------------------
+  
   pvalue[is.na(S)] <- NA
   pvalue <- t(pvalue)
+  
   if (!padj.method == "none") {
     pvalue <- p.adjust(pvalue, method = padj.method)
   }
+  
   S <- t(S)
-
-  # define a dataframe
+  
+  ## define a dataframe
   dat <- data.frame(
     x = factor(rep(colnames(S), each = nrow(S))),
     y = rep(rownames(S), ncol(S)),
     ks = as.vector(S),
     pvalue = as.vector(pvalue)
   )
-  dat$y <- 
-    factor(dat$y, levels = levels(factor(dat$y))[c(length(unique(dat$y)):1)])
+  
+  dat$y <- factor(
+    dat$y,
+    levels = levels(factor(dat$y))[c(length(unique(dat$y)):1)]
+  )
+  
   ks.min <- min(dat$ks, na.rm = TRUE)
+  
   dat$ks[dat$ks < 0 & !is.na(dat$ks)] <- ks.min - 0.001
   dat$ks <- dat$ks - (ks.min - 0.001)
-  dat$ks[which.max(dat$ks)] <- round(sort(dat$ks, decreasing = TRUE)[2] + 0.5)
+  
+  if (any(!is.na(dat$ks))) {
+    dat$ks[which.max(dat$ks)] <- round(sort(dat$ks, decreasing = TRUE)[2] + 0.5)
+  }
+  
   dat$border <- rep("red", nrow(dat))
   dat$border[dat$pvalue >= pvalue.cutoff] <- "gray"
-
-  # globalVariables(c("y", "border", "ks"))
+  
   y <- border <- ks <- NULL
-
+  
   if (normalize) {
     ES.name <- "Normalized\nEnrichment\nScore"
   } else {
     ES.name <- "Enrichment\nScore"
   }
-  if (any(dat$pvalue < pvalue.cutoff)) {
+  
+  if (any(dat$pvalue < pvalue.cutoff, na.rm = TRUE)) {
     g <- ggplot(data = dat) +
-      geom_point(aes(x = x, y = y, color = border, fill = pvalue, size = ks), 
-                 shape = 21) +
+      geom_point(
+        aes(x = x, y = y, color = border, fill = pvalue, size = ks),
+        shape = 21
+      ) +
       scale_fill_gradientn(
-        name = "p-value", na.value = "black", colours = c("blue", "white"),
-        limits = c(0, 1), guide = guide_colorbar(barheight = 3, barwidth = 1)) +
-      geom_point(aes(x = x, y = y, size = ks), color = dat$border, shape = 21) +
-      guides(colour = guide_legend(override.aes = list(size = 5))) +
-      scale_size(name = ES.name, range = c(1, 5), breaks = c(0, 1, 2, 3), 
-                 guide = guide_legend(keyheight = .8)) +
-      theme(axis.text.x = 
-              element_text(size = 8, angle = angle, vjust = 1, hjust = 1), 
-            legend.margin = margin(-0.1,0,0,0, unit="cm")) +
-      xlab("") + ylab("")
-
+        name = "p-value",
+        na.value = "black",
+        colours = c("blue", "white"),
+        limits = c(0, 1),
+        guide = guide_colorbar(barheight = 3, barwidth = 1)
+      ) +
+      geom_point(
+        aes(x = x, y = y, size = ks),
+        color = dat$border,
+        shape = 21
+      ) +
+      guides(
+        colour = guide_legend(
+          override.aes = list(size = 5)
+        )
+      ) +
+      scale_size(
+        name = ES.name,
+        range = c(1, 5),
+        breaks = c(0, 1, 2, 3),
+        guide = guide_legend(keyheight = .8)
+      ) +
+      theme(
+        axis.text.x = element_text(
+          size = 8,
+          angle = angle,
+          vjust = 1,
+          hjust = 1
+        ),
+        legend.margin = margin(-0.1, 0, 0, 0, unit = "cm")
+      ) +
+      xlab("") +
+      ylab("")
+    
     if (pvalue.cutoff == 0.05) {
-      g <- g + scale_color_manual(name = NULL, 
-                                  values = c(`red` = "red"), labels = "p<0.05")
+      g <- g +
+        scale_color_manual(
+          name = NULL,
+          values = c(`red` = "red"),
+          labels = "p<0.05"
+        )
     } else {
       if (pvalue.cutoff == 0.1) {
-        g <- g + scale_color_manual(name = NULL, 
-                                    values = c(`red` = "red"), labels = "p<0.1")
+        g <- g +
+          scale_color_manual(
+            name = NULL,
+            values = c(`red` = "red"),
+            labels = "p<0.1"
+          )
       } else {
-        g <- g + scale_color_manual(name = NULL, values = c("gray", "red"), 
-                                    labels = paste0("p", c(">=", "<"), 
-                                                    pvalue.cutoff))
+        g <- g +
+          scale_color_manual(
+            name = NULL,
+            values = c("gray", "red"),
+            labels = paste0("p", c(">=", "<"), pvalue.cutoff)
+          )
       }
     }
   } else {
     g <- ggplot(data = dat) +
-      geom_point(aes(x = x, y = y, fill = pvalue, size = ks), shape = 21) +
+      geom_point(
+        aes(x = x, y = y, fill = pvalue, size = ks),
+        shape = 21
+      ) +
       scale_fill_gradientn(
-        name = "p-value", na.value = "black", colours = c("blue", "white"),
-        limits = c(round(min(dat$pvalue), 2), 1), 
-        guide = guide_colorbar(barheight = 3, barwidth = 1)) +
-      scale_size(name = ES.name, range = c(1, 5), breaks = c(0, 1, 2, 3), 
-                 guide = guide_legend(keyheight = .8)) +
-      theme(axis.text.x = 
-              element_text(size = 8, angle = 45, vjust = 1, hjust = 1)) +
-      xlab("") + ylab("")
+        name = "p-value",
+        na.value = "black",
+        colours = c("blue", "white"),
+        limits = c(round(min(dat$pvalue, na.rm = TRUE), 2), 1),
+        guide = guide_colorbar(barheight = 3, barwidth = 1)
+      ) +
+      scale_size(
+        name = ES.name,
+        range = c(1, 5),
+        breaks = c(0, 1, 2, 3),
+        guide = guide_legend(keyheight = .8)
+      ) +
+      theme(
+        axis.text.x = element_text(
+          size = 8,
+          angle = 45,
+          vjust = 1,
+          hjust = 1
+        )
+      ) +
+      xlab("") +
+      ylab("")
   }
+  
   print(g)
-
-  return(list(S = S, pvalue = pvalue, g = g))
+  
+  return(
+    list(
+      S = S,
+      pvalue = pvalue,
+      g = g
+    )
+  )
 }

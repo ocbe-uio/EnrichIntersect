@@ -104,8 +104,6 @@ enrichment <- function(
     stop("Feature names must be unique.")
   }
   
-  ## This follows the original source:
-  ## features <- intersect(rownames(x), custom.set[[1]])
   features <- intersect(rownames(x_work), custom.set[[1]])
   
   if (length(features) == 0L) {
@@ -119,7 +117,7 @@ enrichment <- function(
     stop("No valid groups were found in 'custom.set'.")
   }
   
-  ## Restrict x to matched features, preserving the original intersect() order.
+  ## Restrict x to matched features, preserving intersect() order.
   x_work <- x_work[features, , drop = FALSE]
   
   ## Build group-wise feature index list for the C++ core.
@@ -136,19 +134,13 @@ enrichment <- function(
   names(set_indices) <- groups
   
   ## --------------------------------------------------------------------------
-  ## RcppArmadillo replacement for the original heavy for-loop
+  ## RcppArmadillo replacement for original heavy for-loop
   ##
-  ## This replaces the original:
-  ##
-  ##   for (i in seq_len(ncol(x))) {
-  ##       ...
-  ##   }
-  ##
-  ## The C++ function returns matrices with:
+  ## C++ returns matrices with:
   ##   rows    = columns/profiles of x_work
   ##   columns = custom-set groups
   ##
-  ## This is the same orientation as the original S and pvalue before t().
+  ## This matches the original S and pvalue orientation before t().
   ## --------------------------------------------------------------------------
   
   core <- enrichment_core_original(
@@ -169,7 +161,7 @@ enrichment <- function(
   colnames(pvalue) <- groups
   
   ## --------------------------------------------------------------------------
-  ## Original post-processing and original plot format
+  ## Original post-processing
   ## --------------------------------------------------------------------------
   
   pvalue[is.na(S)] <- NA
@@ -181,7 +173,7 @@ enrichment <- function(
   
   S <- t(S)
   
-  ## define a dataframe
+  ## Define plotting dataframe
   dat <- data.frame(
     x = factor(rep(colnames(S), each = nrow(S))),
     y = rep(rownames(S), ncol(S)),
@@ -199,7 +191,7 @@ enrichment <- function(
   dat$ks[dat$ks < 0 & !is.na(dat$ks)] <- ks.min - 0.001
   dat$ks <- dat$ks - (ks.min - 0.001)
   
-  if (any(!is.na(dat$ks))) {
+  if (sum(!is.na(dat$ks)) >= 2L) {
     dat$ks[which.max(dat$ks)] <- round(sort(dat$ks, decreasing = TRUE)[2] + 0.5)
   }
   
@@ -214,6 +206,14 @@ enrichment <- function(
     ES.name <- "Enrichment\nScore"
   }
   
+  ## --------------------------------------------------------------------------
+  ## Original plot format, with legend order:
+  ##
+  ##   1. significance legend, e.g. p<0.05
+  ##   2. p-value colorbar
+  ##   3. enrichment score size legend
+  ## --------------------------------------------------------------------------
+  
   if (any(dat$pvalue < pvalue.cutoff, na.rm = TRUE)) {
     g <- ggplot(data = dat) +
       geom_point(
@@ -225,7 +225,11 @@ enrichment <- function(
         na.value = "black",
         colours = c("blue", "white"),
         limits = c(0, 1),
-        guide = guide_colorbar(barheight = 3, barwidth = 1)
+        guide = guide_colorbar(
+          barheight = 3,
+          barwidth = 1,
+          order = 2
+        )
       ) +
       geom_point(
         aes(x = x, y = y, size = ks),
@@ -234,14 +238,18 @@ enrichment <- function(
       ) +
       guides(
         colour = guide_legend(
-          override.aes = list(size = 5)
+          override.aes = list(size = 5),
+          order = 1
         )
       ) +
       scale_size(
         name = ES.name,
         range = c(1, 5),
         breaks = c(0, 1, 2, 3),
-        guide = guide_legend(keyheight = .8)
+        guide = guide_legend(
+          keyheight = .8,
+          order = 3
+        )
       ) +
       theme(
         axis.text.x = element_text(
@@ -250,7 +258,8 @@ enrichment <- function(
           vjust = 1,
           hjust = 1
         ),
-        legend.margin = margin(-0.1, 0, 0, 0, unit = "cm")
+        legend.margin = margin(-0.1, 0, 0, 0, unit = "cm"),
+        legend.box = "vertical"
       ) +
       xlab("") +
       ylab("")
@@ -260,7 +269,8 @@ enrichment <- function(
         scale_color_manual(
           name = NULL,
           values = c(`red` = "red"),
-          labels = "p<0.05"
+          labels = "p<0.05",
+          guide = guide_legend(order = 1)
         )
     } else {
       if (pvalue.cutoff == 0.1) {
@@ -268,14 +278,16 @@ enrichment <- function(
           scale_color_manual(
             name = NULL,
             values = c(`red` = "red"),
-            labels = "p<0.1"
+            labels = "p<0.1",
+            guide = guide_legend(order = 1)
           )
       } else {
         g <- g +
           scale_color_manual(
             name = NULL,
             values = c("gray", "red"),
-            labels = paste0("p", c(">=", "<"), pvalue.cutoff)
+            labels = paste0("p", c(">=", "<"), pvalue.cutoff),
+            guide = guide_legend(order = 1)
           )
       }
     }
@@ -290,13 +302,20 @@ enrichment <- function(
         na.value = "black",
         colours = c("blue", "white"),
         limits = c(round(min(dat$pvalue, na.rm = TRUE), 2), 1),
-        guide = guide_colorbar(barheight = 3, barwidth = 1)
+        guide = guide_colorbar(
+          barheight = 3,
+          barwidth = 1,
+          order = 1
+        )
       ) +
       scale_size(
         name = ES.name,
         range = c(1, 5),
         breaks = c(0, 1, 2, 3),
-        guide = guide_legend(keyheight = .8)
+        guide = guide_legend(
+          keyheight = .8,
+          order = 2
+        )
       ) +
       theme(
         axis.text.x = element_text(
@@ -304,7 +323,8 @@ enrichment <- function(
           angle = 45,
           vjust = 1,
           hjust = 1
-        )
+        ),
+        legend.box = "vertical"
       ) +
       xlab("") +
       ylab("")

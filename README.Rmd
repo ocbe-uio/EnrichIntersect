@@ -8,11 +8,22 @@
 
 `EnrichIntersect` is a flexible tool for enrichment analysis based on user-defined sets. It allows users to perform over-representation analysis of custom sets among any specified ranked feature list, making enrichment analysis applicable to various types of data from different scientific fields. `EnrichIntersect` also provides interactive visualization of intersecting sets, for example based on the mix-lasso model ([Zhao et al., 2022](https://doi.org/10.1016/j.isci.2022.104767)) or similar methods.
 
-To get started, load the package with:
 
-```{r}
+## Installation
+
+Install the latest released version from [CRAN](https://CRAN.R-project.org/package=EnrichIntersect):
+
+```{r eval=FALSE}
 library("EnrichIntersect")
 ```
+
+Install the latest development version from [GitHub](https://github.com/ocbe-uio/EnrichIntersect):
+
+```{r eval=FALSE}
+# library("pak")
+pak::pak("ocbe-uio/EnrichIntersect")
+```
+
 
 ## Examples
 

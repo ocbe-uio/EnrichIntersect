@@ -17,10 +17,21 @@ visualization of intersecting sets, for example based on the mix-lasso
 model ([Zhao et al., 2022](https://doi.org/10.1016/j.isci.2022.104767))
 or similar methods.
 
-To get started, load the package with:
+## Installation
+
+Install the latest released version from
+[CRAN](https://CRAN.R-project.org/package=EnrichIntersect):
 
 ``` r
 library("EnrichIntersect")
+```
+
+Install the latest development version from
+[GitHub](https://github.com/ocbe-uio/EnrichIntersect):
+
+``` r
+# library("pak")
+pak::pak("ocbe-uio/EnrichIntersect")
 ```
 
 ## Examples

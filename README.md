@@ -111,8 +111,6 @@ intersectSankey(
 )
 ```
 
-    #> file:////Users/zhiz/zz/github/EnrichIntersect/sankey.html screenshot completed
-
 ![](man/figures/sankey-diagram-1.png)<!-- -->
 
 ## Citation

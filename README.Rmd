@@ -1,3 +1,12 @@
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.path = "man/figures/",
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+<img src="man/figures/logo.png" align="right" width="160"/>
+
 [![CRAN](http://www.r-pkg.org/badges/version/EnrichIntersect)](https://cran.r-project.org/package=EnrichIntersect)
 [![r-universe](https://ocbe-uio.r-universe.dev/badges/EnrichIntersect)](https://zhizuio.r-universe.dev/EnrichIntersect)
 [![R-CMD-check](https://github.com/ocbe-uio/EnrichIntersect/workflows/R-CMD-check/badge.svg)](https://github.com/ocbe-uio/EnrichIntersect/actions)
@@ -14,7 +23,7 @@
 Install the latest released version from [CRAN](https://CRAN.R-project.org/package=EnrichIntersect):
 
 ```{r eval=FALSE}
-library("EnrichIntersect")
+install.packages("EnrichIntersect")
 ```
 
 Install the latest development version from [GitHub](https://github.com/ocbe-uio/EnrichIntersect):
@@ -36,6 +45,7 @@ The default setup of `enrichment()` uses a classic Kolmogorov-Smirnov-like test 
 In the visualization, statistically significantly enriched feature sets are marked with red circles at a pre-specified significance level. The p-values can be adjusted by specifying `padj.method`, using one of `c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")`. Users can specify `alpha` for calculating a weighted enrichment score, `normalize = FALSE` for using the standard enrichment score rather than the normalized score, `permute.n` for the number of permutations, and `pvalue.cutoff` for marking enriched categories at a specific significance level.
 
 ```{r enrichment-map, eval=TRUE, results="hide", fig.width=7.2, fig.height=5}
+library(EnrichIntersect)
 data(cancers_drug_groups, package = "EnrichIntersect")
 
 x <- cancers_drug_groups$score
@@ -56,12 +66,20 @@ Besides displaying the Sankey diagram in the R graphics device, users can save i
 
 The example data object `cancers_genes_drugs` is an `array` with associations between 56 genes, two cancer types, and two drugs. Users can adjust `out.fig` for different output formats and use `step.names` to label the three dimensions in the Sankey diagram.
 
-```{r sankey-diagram, eval=TRUE, fig.width=9, fig.height=7}
+```{r sankey-diagram0, eval=FALSE}
 data(cancers_genes_drugs, package = "EnrichIntersect")
 
 intersectSankey(
   cancers_genes_drugs,
-  step.names = c("Cancers", "Genes", "Drugs")
+  step.names = c("Cancers", "Genes", "Drugs"), 
+)
+```
+
+```{r sankey-diagram, echo=FALSE, eval=TRUE, fig.width=9, fig.height=7}
+intersectSankey(
+  cancers_genes_drugs,
+  step.names = c("Cancers", "Genes", "Drugs"), 
+  out.fig = "png"
 )
 ```
 

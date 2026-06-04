@@ -1,4 +1,6 @@
 
+<img src="man/figures/logo.png" align="right" width="160"/>
+
 [![CRAN](http://www.r-pkg.org/badges/version/EnrichIntersect)](https://cran.r-project.org/package=EnrichIntersect)
 [![r-universe](https://ocbe-uio.r-universe.dev/badges/EnrichIntersect)](https://zhizuio.r-universe.dev/EnrichIntersect)
 [![R-CMD-check](https://github.com/ocbe-uio/EnrichIntersect/workflows/R-CMD-check/badge.svg)](https://github.com/ocbe-uio/EnrichIntersect/actions)
@@ -23,7 +25,7 @@ Install the latest released version from
 [CRAN](https://CRAN.R-project.org/package=EnrichIntersect):
 
 ``` r
-library("EnrichIntersect")
+install.packages("EnrichIntersect")
 ```
 
 Install the latest development version from
@@ -62,6 +64,7 @@ the normalized score, `permute.n` for the number of permutations, and
 significance level.
 
 ``` r
+library(EnrichIntersect)
 data(cancers_drug_groups, package = "EnrichIntersect")
 
 x <- cancers_drug_groups$score
@@ -71,7 +74,7 @@ set.seed(123)
 enrich <- enrichment(x, custom.set, permute.n = 1000)
 ```
 
-![](README_files/figure-gfm/enrichment-map-1.png)<!-- -->
+![](man/figures/enrichment-map-1.png)<!-- -->
 
 ### Plot Sankey diagram for intersecting sets through an array
 
@@ -104,11 +107,13 @@ data(cancers_genes_drugs, package = "EnrichIntersect")
 
 intersectSankey(
   cancers_genes_drugs,
-  step.names = c("Cancers", "Genes", "Drugs")
+  step.names = c("Cancers", "Genes", "Drugs"), 
 )
 ```
 
-![](README_files/figure-gfm/sankey-diagram-1.png)<!-- -->
+    #> file:////Users/zhiz/zz/github/EnrichIntersect/sankey.html screenshot completed
+
+![](man/figures/sankey-diagram-1.png)<!-- -->
 
 ## Citation
 
